@@ -1,0 +1,44 @@
+# CI workflow for DevOps Lab Exercise 2
+# Runs automatically on every commit pushed to the repo, and on pull requests to main.
+
+name: CI
+
+on:
+  push:
+    branches: ["**"]        # every commit on any branch triggers the pipeline
+  pull_request:
+    branches: [main]
+  workflow_dispatch:        # lets you also run it manually from the Actions tab
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]   # test on two Python versions
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Lint with flake8
+        run: flake8 app tests --max-line-length=100
+
+      - name: Run unit tests
+        run: pytest -v
+
+      - name: Build summary
+        if: success()
+        run: echo "✅ Build passed for commit ${{ github.sha }} on Python ${{ matrix.python-version }}"

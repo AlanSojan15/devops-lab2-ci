@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculator</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+    .card {
+      width: 100%;
+      max-width: 360px;
+      margin: 16px;
+      padding: 24px;
+      background: #1e293b;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    h1 { margin: 0 0 4px; font-size: 1.4rem; }
+    p.sub { margin: 0 0 20px; color: #94a3b8; font-size: 0.85rem; }
+    label { display: block; margin-bottom: 12px; font-size: 0.85rem; color: #94a3b8; }
+    input {
+      width: 100%;
+      margin-top: 4px;
+      padding: 10px 12px;
+      font-size: 1.1rem;
+      color: #f8fafc;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+    }
+    input:focus { outline: 2px solid #38bdf8; border-color: transparent; }
+    .ops { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 16px 0; }
+    button {
+      padding: 12px 0;
+      font-size: 1.3rem;
+      color: #f8fafc;
+      background: #0ea5e9;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover { background: #38bdf8; }
+    #result {
+      min-height: 3.2rem;
+      padding: 12px;
+      font-size: 1.3rem;
+      text-align: center;
+      background: #0f172a;
+      border-radius: 8px;
+    }
+    #result.error { color: #f87171; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Calculator</h1>
+    <p class="sub">DevOps Lab 2 &ndash; CI with GitHub Actions</p>
+
+    <label>First number
+      <input id="a" type="number" step="any" value="0" autofocus>
+    </label>
+    <label>Second number
+      <input id="b" type="number" step="any" value="0">
+    </label>
+
+    <div class="ops">
+      <button data-op="add" title="Add">+</button>
+      <button data-op="subtract" title="Subtract">&minus;</button>
+      <button data-op="multiply" title="Multiply">&times;</button>
+      <button data-op="divide" title="Divide">&divide;</button>
+    </div>
+
+    <div id="result" aria-live="polite">Pick an operation</div>
+  </main>
+
+  <script>
+    const symbols = { add: "+", subtract: "−", multiply: "×", divide: "÷" };
+    const result = document.getElementById("result");
+
+    async function calculate(op) {
+      const a = document.getElementById("a").value;
+      const b = document.getElementById("b").value;
+      const params = new URLSearchParams({ a, b });
+      try {
+        const response = await fetch(`/${op}?${params}`);
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "Something went wrong");
+        }
+        result.className = "";
+        result.textContent = `${data.a} ${symbols[op]} ${data.b} = ${data.result}`;
+      } catch (err) {
+        result.className = "error";
+        result.textContent = err.message;
+      }
+    }
+
+    document.querySelectorAll("button[data-op]").forEach((btn) => {
+      btn.addEventListener("click", () => calculate(btn.dataset.op));
+    });
+  </script>
+</body>
+</html>
