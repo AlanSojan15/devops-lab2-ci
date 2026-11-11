@@ -1,6 +1,6 @@
 # DevOps Lab Exercise 2 — Basic CI Workflow with GitHub Actions
 
-![CI](https://github.com/<your-username>/devops-lab2-ci/actions/workflows/ci.yml/badge.svg)
+   ![CI](https://github.com/AlanSojan15/devops-lab2-ci/actions/workflows/ci.yml/badge.svg)
 
 **Aim:** Design and implement a basic Continuous Integration (CI) workflow that is triggered automatically by commits, using GitHub Actions.
 
